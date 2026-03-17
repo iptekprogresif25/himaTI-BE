@@ -4,7 +4,15 @@ import { swaggerUI } from "@hono/swagger-ui"
 // controllers
 import * as activityController from "../controllers/activity.controller.js"
 import * as authController from "../controllers/auth.controller.js"
+// controllers
+import * as productController from "../controllers/product.controller.js"
 
+// validators
+import {
+  createProductSchema,
+  updateProductSchema,
+  idSchema as productIdSchema
+} from "../validators/product.validator.js"
 // validators
 import {
   createActivitySchema,
@@ -160,6 +168,99 @@ const deleteActivity = createRoute({
 })
 
 docApp.openapi(deleteActivity, activityController.remove)
+
+const getAllProduct = createRoute({
+  method: "get",
+  path: "/api/product",
+  tags: ["Product"],
+  responses: {
+    200: {
+      description: "Get all products"
+    }
+  }
+})
+
+docApp.openapi(getAllProduct, productController.getAll)
+
+const getProductById = createRoute({
+  method: "get",
+  path: "/api/product/{id}",
+  tags: ["Product"],
+  request: {
+    params: productIdSchema
+  },
+  responses: {
+    200: { description: "Product found" },
+    404: { description: "Product not found" }
+  }
+})
+
+docApp.openapi(getProductById, productController.getOne)
+
+const createProduct = createRoute({
+  method: "post",
+  path: "/api/product",
+  tags: ["Product"],
+  security: [{ BearerAuth: [] }],
+  request: {
+    body: {
+      content: {
+        "multipart/form-data": {
+          schema: createProductSchema.extend({
+            image: z.any()
+          })
+        }
+      }
+    }
+  },
+  responses: {
+    201: { description: "Product created" },
+    401: { description: "Unauthorized" }
+  }
+})
+
+docApp.openapi(createProduct, productController.create)
+
+const updateProduct = createRoute({
+  method: "patch",
+  path: "/api/product/{id}",
+  tags: ["Product"],
+  security: [{ BearerAuth: [] }],
+  request: {
+    params: productIdSchema,
+    body: {
+      content: {
+        "multipart/form-data": {
+          schema: updateProductSchema.extend({
+            image: z.any().optional()
+          })
+        }
+      }
+    }
+  },
+  responses: {
+    200: { description: "Product updated" },
+    404: { description: "Product not found" }
+  }
+})
+
+docApp.openapi(updateProduct, productController.update)
+
+const deleteProduct = createRoute({
+  method: "delete",
+  path: "/api/product/{id}",
+  tags: ["Product"],
+  security: [{ BearerAuth: [] }],
+  request: {
+    params: productIdSchema
+  },
+  responses: {
+    200: { description: "Product deleted" },
+    404: { description: "Product not found" }
+  }
+})
+
+docApp.openapi(deleteProduct, productController.remove)
 
 /**
  * =========================
