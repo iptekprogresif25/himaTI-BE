@@ -14,7 +14,7 @@ activityRoute.get("/", controller.getAll)
 
 activityRoute.get("/:id", zValidator("param", idSchema), controller.getOne)
 
-activityRoute.post("/", authMiddleware, zValidator("param", idSchema), zValidator("form", createActivitySchema), controller.create)
+activityRoute.post("/", authMiddleware, zValidator("form", createActivitySchema), controller.create)
 
 activityRoute.patch("/:id", authMiddleware, zValidator("param", idSchema), zValidator("form", updateActivitySchema), controller.update)
 

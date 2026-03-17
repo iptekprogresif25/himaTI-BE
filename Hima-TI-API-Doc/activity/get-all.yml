@@ -8,7 +8,7 @@ http:
   url: http://localhost:3000/activity
   auth:
     type: bearer
-    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExY2FiMWU5LWVmYTctNDc2ZC05M2M3LWZhNTE5YjQxYjllZCIsImVtYWlsIjoiYXRtaW5AZXhhbXBsZS5jb20iLCJpYXQiOjE3NzM1MDU5ODUsImV4cCI6MTc3MzUwOTU4NX0.9v6VV8nxbtge_0XmpiVOudSZovEeOXxid2dxkeFUKak
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExY2FiMWU5LWVmYTctNDc2ZC05M2M3LWZhNTE5YjQxYjllZCIsImVtYWlsIjoiYXRtaW5AZXhhbXBsZS5jb20iLCJpYXQiOjE3NzM1MTExMjUsImV4cCI6MTc3MzUxNDcyNX0.BlG8CJj_TuWziZdWv4rgBTnpBbgDdYJvDpo6uhL0JV0
 
 settings:
   encodeUrl: true

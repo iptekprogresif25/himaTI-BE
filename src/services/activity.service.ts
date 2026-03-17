@@ -20,21 +20,29 @@ export const getActivityById = async (id: string) => {
 export const createActivity = async (
   name: string,
   description: string,
-  image: File,
+  image: File | undefined,
   url: string
 ) => {
 
-  const imageUpload = await uploadImage(image,"activity")
+  let imageUrl: string | null = null
+  let imagePublicId: string | null = null
+
+  if (image) {
+    const imageUpload = await uploadImage(image, "activities")
+    imageUrl = imageUpload.url
+    imagePublicId = imageUpload.public_id
+  }
 
   return await activityModel.create({
     name,
     description,
-    image_url: imageUpload.url,
-    image_public_id: imageUpload.public_id,
+    image_url: imageUrl,
+    image_public_id: imagePublicId,
     url
   })
 
 }
+
 
 export const updateActivity = async (
   id: string,
@@ -44,24 +52,26 @@ export const updateActivity = async (
   const activity = await activityModel.findById(id)
 
   if (!activity) {
-    throw new Error("Activity not found")
+    return null // ⬅️ jangan throw
   }
 
-  if (data.image) {
+  if (data.image instanceof File) {
 
     if (activity.image_public_id) {
       await deleteImage(activity.image_public_id)
     }
 
-    const image = await uploadImage(data.image, "activity")
+    const image = await uploadImage(data.image, "activities")
 
     data.image_url = image.url
     data.image_public_id = image.public_id
   }
 
-  return await activityModel.update(id, data)
+  delete data.image
 
+  return await activityModel.update(id, data)
 }
+
 
 export const deleteActivity = async (id: string) => {
 

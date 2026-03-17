@@ -5,29 +5,29 @@ info:
 
 http:
   method: PATCH
-  url: http://localhost:3000/activity/ffd34e17-a48c-4d62-9f7c-f13f484dc656
+  url: http://localhost:3000/activity/35d485bb-b967-4efc-8110-e0b145395234
   body:
     type: multipart-form
     data:
       - name: name
         type: text
-        value: kayu
+        value: keeeu
         disabled: true
       - name: description
         type: text
-        value: huhuhu
+        value: huhu
         disabled: true
       - name: url
         type: text
-        value: https://example.com/kayu
+        value: https://exmple.com/kayu
         disabled: true
       - name: image
         type: file
         value:
-          - /home/gagalmasukptn/Downloads/2abe91b7-c1c7-4e8e-b987-fd64bd13f859.jpg
+          - /home/gagalmasukptn/Downloads/226ca134-7971-4b2e-b568-d1b91406fe67.jpg
   auth:
     type: bearer
-    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExY2FiMWU5LWVmYTctNDc2ZC05M2M3LWZhNTE5YjQxYjllZCIsImVtYWlsIjoiYXRtaW5AZXhhbXBsZS5jb20iLCJpYXQiOjE3NzM1MDU5ODUsImV4cCI6MTc3MzUwOTU4NX0.9v6VV8nxbtge_0XmpiVOudSZovEeOXxid2dxkeFUKak
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExY2FiMWU5LWVmYTctNDc2ZC05M2M3LWZhNTE5YjQxYjllZCIsImVtYWlsIjoiYXRtaW5AZXhhbXBsZS5jb20iLCJpYXQiOjE3NzM1MTExMjUsImV4cCI6MTc3MzUxNDcyNX0.BlG8CJj_TuWziZdWv4rgBTnpBbgDdYJvDpo6uhL0JV0
 
 settings:
   encodeUrl: true
