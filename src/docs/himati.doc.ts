@@ -318,7 +318,7 @@ const createAspiration = createRoute({
       content: {
         "multipart/form-data": {
           schema: createAspirationSchema.extend({
-            image: z.any().optional()
+            file: z.any().optional()
           })
         }
       }
