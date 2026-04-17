@@ -5,13 +5,13 @@ info:
 
 http:
   method: POST
-  url: http://localhost:3000/auth/login
+  url: http://localhost:3000/api/auth/login
   body:
     type: json
     data: |-
       {
-        "email": "atmin@example.com",
-        "password": "password"
+        "email": "himaTI@uniku.ac.id",
+        "password": "H1m4TIPerkasa26"
       }
   auth: inherit
 

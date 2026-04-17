@@ -1,0 +1,40 @@
+info:
+  name: create
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:3000/api/aspiration
+  body:
+    type: multipart-form
+    data:
+      - name: name
+        type: text
+        value: kayu
+      - name: category
+        type: text
+        value: dosem
+      - name: topic
+        type: text
+        value: dosen pemelas
+      - name: description
+        type: text
+        value: biaslaah diamah
+      - name: urgency
+        type: text
+        value: "5"
+      - name: contact_person
+        type: text
+        value: w@f.com
+      - name: file
+        type: file
+        value:
+          - /home/gagalmasukptn/Downloads/2abe91b7-c1c7-4e8e-b987-fd64bd13f859.jpg
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

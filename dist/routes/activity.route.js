@@ -1,0 +1,12 @@
+import { Hono } from "hono";
+import { zValidator } from "@hono/zod-validator";
+import { authMiddleware } from "../middleware/auth.middleware.js";
+import * as controller from "../controllers/activity.controller.js";
+import { createActivitySchema, updateActivitySchema, idSchema } from "../validators/activity.validator.js";
+const activityRoute = new Hono();
+activityRoute.get("/", controller.getAll);
+activityRoute.get("/:id", zValidator("param", idSchema), controller.getOne);
+activityRoute.post("/", authMiddleware, zValidator("form", createActivitySchema), controller.create);
+activityRoute.patch("/:id", authMiddleware, zValidator("param", idSchema), zValidator("form", updateActivitySchema), controller.update);
+activityRoute.delete("/:id", authMiddleware, zValidator("param", idSchema), controller.remove);
+export default activityRoute;

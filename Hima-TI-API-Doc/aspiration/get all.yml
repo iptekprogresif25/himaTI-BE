@@ -1,0 +1,17 @@
+info:
+  name: get all
+  type: http
+  seq: 4
+
+http:
+  method: GET
+  url: http://localhost:3000/api/aspiration
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImYwMTVkZWYzLTc2Y2EtNDEyMS05YTM5LTRjMWNiNzI2OGM3MSIsImVtYWlsIjoiaGltYVRJQHVuaWt1LmFjLmlkIiwiaWF0IjoxNzc2NDM1NTkyLCJleHAiOjE3NzY0MzkxOTJ9.M-_Tw-PcuFSpmiQxvWAwH8FJ-hseMLPcz6E5ma7hfcA
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

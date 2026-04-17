@@ -6,6 +6,8 @@ import * as activityController from "../controllers/activity.controller.js"
 import * as authController from "../controllers/auth.controller.js"
 // controllers
 import * as productController from "../controllers/product.controller.js"
+// controllers
+import * as aspirationController from "../controllers/aspiration.controller.js"
 
 // validators
 import {
@@ -19,6 +21,11 @@ import {
   updateActivitySchema,
   idSchema
 } from "../validators/activity.validator.js"
+// validators
+import {
+  createAspirationSchema,
+  idSchema as aspirationIdSchema
+} from "../validators/aspiration.validator.js"
 
 const docApp = new OpenAPIHono()
 
@@ -261,6 +268,87 @@ const deleteProduct = createRoute({
 })
 
 docApp.openapi(deleteProduct, productController.remove)
+
+/**
+ * =========================
+ * 📦 ASPIRATION ROUTES
+ * =========================
+ */
+
+// GET ALL
+const getAllAspiration = createRoute({
+  method: "get",
+  path: "/api/aspiration",
+  tags: ["Aspiration"],
+  responses: {
+    200: {
+      description: "Get all aspirations"
+    }
+  }
+})
+
+docApp.openapi(getAllAspiration, aspirationController.getAll)
+
+
+// GET BY ID
+const getAspirationById = createRoute({
+  method: "get",
+  path: "/api/aspiration/{id}",
+  tags: ["Aspiration"],
+  request: {
+    params: aspirationIdSchema
+  },
+  responses: {
+    200: { description: "Aspiration found" },
+    404: { description: "Aspiration not found" }
+  }
+})
+
+docApp.openapi(getAspirationById, aspirationController.getOne)
+
+
+// CREATE
+const createAspiration = createRoute({
+  method: "post",
+  path: "/api/aspiration",
+  tags: ["Aspiration"],
+  security: [{ BearerAuth: [] }],
+  request: {
+    body: {
+      content: {
+        "multipart/form-data": {
+          schema: createAspirationSchema.extend({
+            image: z.any().optional()
+          })
+        }
+      }
+    }
+  },
+  responses: {
+    201: { description: "Aspiration created" },
+    401: { description: "Unauthorized" }
+  }
+})
+
+docApp.openapi(createAspiration, aspirationController.create)
+
+
+// DELETE
+const deleteAspiration = createRoute({
+  method: "delete",
+  path: "/api/aspiration/{id}",
+  tags: ["Aspiration"],
+  security: [{ BearerAuth: [] }],
+  request: {
+    params: aspirationIdSchema
+  },
+  responses: {
+    200: { description: "Aspiration deleted" },
+    404: { description: "Aspiration not found" }
+  }
+})
+
+docApp.openapi(deleteAspiration, aspirationController.remove)
 
 /**
  * =========================
