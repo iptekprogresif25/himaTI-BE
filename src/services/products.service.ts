@@ -21,6 +21,8 @@ export const createProduct = async (
   name: string,
   description: string,
   category: string,
+  url: string,
+  price: number,
   image: File,
 ) => {
 
@@ -31,7 +33,9 @@ export const createProduct = async (
     description,
     image_url: imageUpload.url,
     image_public_id: imageUpload.public_id,
-    category
+    category,
+    url,
+    price
 })
 
 }
@@ -47,6 +51,7 @@ export const updateProduct = async (
     throw new Error("Product not found")
   }
 
+  // 🔥 HANDLE IMAGE (opsional)
   if (data.image) {
 
     if (product.image_public_id) {
@@ -57,10 +62,11 @@ export const updateProduct = async (
 
     data.image_url = image.url
     data.image_public_id = image.public_id
+
+    delete data.image // biar gak ikut ke DB
   }
 
   return await ProductModel.update(id, data)
-
 }
 
 export const deleteProduct = async (id: string) => {

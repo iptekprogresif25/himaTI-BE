@@ -5,7 +5,7 @@ info:
 
 http:
   method: DELETE
-  url: http://localhost:3000/api/aspiration/cd1487c9-6236-44dd-9326-2e3805fc84ac
+  url: http://localhost:3000/api/aspiration/14781139-cf4f-43d1-b32d-6bf21e5f5cc9
   auth:
     type: bearer
     token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImYwMTVkZWYzLTc2Y2EtNDEyMS05YTM5LTRjMWNiNzI2OGM3MSIsImVtYWlsIjoiaGltYVRJQHVuaWt1LmFjLmlkIiwiaWF0IjoxNzc2NDM1NTkyLCJleHAiOjE3NzY0MzkxOTJ9.M-_Tw-PcuFSpmiQxvWAwH8FJ-hseMLPcz6E5ma7hfcA

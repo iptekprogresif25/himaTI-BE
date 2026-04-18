@@ -23,7 +23,8 @@ export const create = async (data: any) => {
       category,
       image_url,
       image_public_id,
-      url
+      url,
+      price
     )
     VALUES (
       ${data.name},
@@ -31,6 +32,8 @@ export const create = async (data: any) => {
       ${data.category},
       ${data.image_url},
       ${data.image_public_id},
+      ${data.url},
+      ${data.price}
     )
     RETURNING *
   `
@@ -49,6 +52,8 @@ export const update = async (id: string, data: any) => {
       category = COALESCE(${data.category}, category),
       image_url = COALESCE(${data.image_url}, image_url),
       image_public_id = COALESCE(${data.image_public_id}, image_public_id),
+      url = COALESCE(${data.url}, url),
+      price = COALESCE(${data.price}, price),
       updated_at = NOW()
     WHERE id = ${id}
     RETURNING *

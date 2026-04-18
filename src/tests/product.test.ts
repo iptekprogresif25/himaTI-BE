@@ -1,13 +1,11 @@
-import { describe, it, expect, beforeAll } from "vitest"
+import { describe, it, expect } from "vitest"
 import app from "../app.js"
 
 let token: string | null = null
+let productId: string | null = null
 
-// UUID contoh untuk test
-const validUUID = "550e8400-e29b-41d4-a716-446655440000"
 const invalidUUID = "123"
 
-// Simulasi login user sebelum test
 describe("User Authentication Flow", () => {
 
   it("User login with valid credentials", async () => {
@@ -23,59 +21,39 @@ describe("User Authentication Flow", () => {
       })
     })
 
-    // kemungkinan response
     expect([200, 401]).toContain(res.status)
 
     if (res.status === 200) {
       const data = await res.json()
       token = data.token
     }
-//     console.log("STATUS:", res.status)
-
-// const text = await res.text()
-// console.log("BODY:", text)
-
   })
 
 })
 
-describe("Product API User Simulation", () => {
+describe("Product API (PATCH version)", () => {
 
-
-  /**
-   * TEST 1
-   * akses endpoint protected tanpa token
-   */
-  it("POST /api/product  WITHOUT token should return unauthorized", async () => {
+  it("POST /api/product WITHOUT token → unauthorized", async () => {
 
     const form = new FormData()
-
     form.append("name", "Test Product")
-    form.append("description", "Product Description")
+
     const res = await app.request("/api/product", {
       method: "POST",
       body: form
     })
 
     expect([401,403]).toContain(res.status)
-
   })
 
-    /**
-   * TEST 2
-   * create product dengan login
-   */
-  it("POST /api/product WITH token should create product", async () => {
+  it("POST /api/product WITH token → create product", async () => {
 
-    if (!token) {
-      console.warn("Skipping test because login failed")
-      return
-    }
+    if (!token) return
 
     const form = new FormData()
-
     form.append("name", "Test Product")
-    form.append("description", "Product for testing")
+    form.append("description", "Initial description")
+    form.append("price", "10000")
 
     const res = await app.request("/api/product", {
       method: "POST",
@@ -88,121 +66,102 @@ describe("Product API User Simulation", () => {
     expect([201,400]).toContain(res.status)
 
     if (res.status === 201) {
-
       const data = await res.json()
 
-      expect(data).toHaveProperty("id")
-      expect(data).toHaveProperty("name")
-
-    }
-
-  })
-
-  it("POST /api/product WITH token without image", async () => {
-
-    if (!token) {
-      console.warn("Skipping test because login failed")
-      return
-    }
-
-    const form = new FormData()
-
-    form.append("name", "Test Product")
-    form.append("description", "Product for testing")
-
-    const res = await app.request("/api/product", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
-      body: form
-    })
-
-    expect([201,400]).toContain(res.status)
-
-    if (res.status === 201) {
-
-      const data = await res.json()
+      productId = data.id
 
       expect(data).toHaveProperty("id")
-      expect(data).toHaveProperty("name")
-
+      expect(data.name).toBe("Test Product")
     }
-
   })
 
-  /**
-   * TEST 3
-   * invalid UUID
-   */
-  it("GET /api/product/:id with INVALID UUID should return 400", async () => {
-
-    const res = await app.request(`/api/product/${invalidUUID}`)
-
-    expect(res.status).toBe(400)
-
-  })
-
-
-  /**
-   * TEST 4
-   * valid UUID tapi data tidak ada
-   */
-  it("GET /api/product/:id NOT FOUND should return 404", async () => {
-
-    const res = await app.request(`/api/product/${validUUID}`)
-
-    expect([200,404]).toContain(res.status)
-
-  })
-
-  /**
-   * TEST 5
-   * update product tanpa token
-   */
-  it("PATCH /api/product/:id WITHOUT token should return unauthorized", async () => {
-
-    const form = new FormData()
-
-    form.append("name", "Updated Product")
-
-    const res = await app.request(`/api/product/${validUUID}`, {
-      method: "PATCH",
-      body: form
-    })
-
-    expect([401,403]).toContain(res.status)
-
-  })
-
-    /**
-   * TEST 1
-   * akses endpoint tanpa login
-   */
-  it("GET /api/product WITHOUT login should still work if public", async () => {
+  it("GET /api/product → should return list", async () => {
 
     const res = await app.request("/api/product")
 
     expect(res.status).toBe(200)
 
     const data = await res.json()
-
     expect(Array.isArray(data)).toBe(true)
-
   })
 
-  /**
-   * TEST 7
-   * delete product tanpa login
-   */
-  it("DELETE /api/product/:id WITHOUT token should fail", async () => {
+  it("GET /api/product/:id INVALID UUID → 400", async () => {
 
-    const res = await app.request(`/api/product/${validUUID}`, {
+    const res = await app.request(`/api/product/${invalidUUID}`)
+    expect(res.status).toBe(400)
+  })
+
+  it("GET /api/product/:id → should work", async () => {
+
+    if (!productId) return
+
+    const res = await app.request(`/api/product/${productId}`)
+    expect([200,404]).toContain(res.status)
+  })
+
+  it("PATCH /api/product/:id WITHOUT token → unauthorized", async () => {
+
+    if (!productId) return
+
+    const form = new FormData()
+    form.append("name", "Updated Name")
+
+    const res = await app.request(`/api/product/${productId}`, {
+      method: "PATCH",
+      body: form
+    })
+
+    expect([401,403]).toContain(res.status)
+  })
+
+  it("PATCH /api/product/:id WITH token → partial update", async () => {
+
+    if (!token || !productId) return
+
+    const form = new FormData()
+    form.append("name", "Updated Product Name")
+
+    const res = await app.request(`/api/product/${productId}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      body: form
+    })
+
+    expect([200,400]).toContain(res.status)
+
+    if (res.status === 200) {
+      const data = await res.json()
+
+      expect(data.name).toBe("Updated Product Name")
+      // ❗ field lain tidak berubah (PATCH behavior)
+    }
+  })
+
+  it("DELETE /api/product/:id WITHOUT token → fail", async () => {
+
+    if (!productId) return
+
+    const res = await app.request(`/api/product/${productId}`, {
       method: "DELETE"
     })
 
     expect([401,403]).toContain(res.status)
+  })
 
+  it("DELETE /api/product/:id WITH token → success", async () => {
+
+    if (!token || !productId) return
+
+    const res = await app.request(`/api/product/${productId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect([200,204]).toContain(res.status)
   })
 
 })

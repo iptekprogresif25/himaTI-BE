@@ -12,9 +12,9 @@ const productRoute = new Hono()
 
 productRoute.get("/", controller.getAll)
 
-productRoute.get("/:id", zValidator("param", idSchema), controller.getOne)
+productRoute.get("/:id", controller.getOne)
 
-productRoute.post("/", authMiddleware, zValidator("param", idSchema), zValidator("form", createProductSchema), controller.create)
+productRoute.post("/", authMiddleware, zValidator("form", createProductSchema), controller.create)
 
 productRoute.patch("/:id", authMiddleware, zValidator("param", idSchema), zValidator("form", updateProductSchema), controller.update)
 

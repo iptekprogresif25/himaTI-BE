@@ -1,0 +1,39 @@
+info:
+  name: create
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:3000/api/product
+  body:
+    type: multipart-form
+    data:
+      - name: name
+        type: text
+        value: dide
+      - name: description
+        type: text
+        value: prinadi mode gimang
+      - name: category
+        type: text
+        value: makan
+      - name: url
+        type: text
+        value: http://localhost:3000/api/product
+      - name: image
+        type: file
+        value:
+          - /home/gagalmasukptn/Downloads/226ca134-7971-4b2e-b568-d1b91406fe67.jpg
+      - name: price
+        type: text
+        value: "12000"
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImYwMTVkZWYzLTc2Y2EtNDEyMS05YTM5LTRjMWNiNzI2OGM3MSIsImVtYWlsIjoiaGltYVRJQHVuaWt1LmFjLmlkIiwiaWF0IjoxNzc2NDg4ODc3LCJleHAiOjE3NzY0OTI0Nzd9.oFM3PhSKKAn_ZPEucljAldMWtMiOHFlJJKwNABQpf2Q
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

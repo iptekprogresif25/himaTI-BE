@@ -51,11 +51,14 @@ export const create = async (c: Context) => {
   try {
 
     const body = await c.req.parseBody()
+    const priceNumber = Number(body.price as string)
 
     const product = await productService.createProduct(
       body.name as string,
       body.description as string,
       body.category as string,
+      body.url as string,
+      priceNumber,
       body.image as File
     )
 
@@ -74,7 +77,6 @@ export const create = async (c: Context) => {
 
 export const update = async (c: Context) => {
   try {
-
     const id = c.req.param("id")
 
     if (!id) {
@@ -83,7 +85,24 @@ export const update = async (c: Context) => {
 
     const body = await c.req.parseBody()
 
-    const product = await productService.updateProduct(id, body)
+    // 🔥 FILTER & NORMALISASI DATA (PATCH STYLE)
+    const data: any = {}
+
+    if (typeof body.name === "string") data.name = body.name
+    if (typeof body.description === "string") data.description = body.description
+    if (typeof body.category === "string") data.category = body.category
+    if (typeof body.url === "string") data.url = body.url
+
+    if (typeof body.price === "string") {
+      data.price = Number(body.price)
+    }
+
+    // file tetap file
+    if (body.image instanceof File) {
+      data.image = body.image
+    }
+
+    const product = await productService.updateProduct(id, data)
 
     if (!product) {
       return c.json({ message: "Product not found" }, 404)
@@ -92,13 +111,11 @@ export const update = async (c: Context) => {
     return c.json(product)
 
   } catch (err) {
-
     console.error(err)
 
     return c.json({
       message: "Internal Server Error"
     }, 500)
-
   }
 }
 
