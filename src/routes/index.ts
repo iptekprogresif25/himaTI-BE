@@ -8,7 +8,7 @@ import aspirationRoute from "./aspiration.route.js";
 const routes = new Hono()
 
 routes.use(cors({
-  origin: 'https://hima-ti-uniku.uniku.ac.id',
+  origin: 'https://hima-ti.uniku.ac.id',
   credentials: true,
 }))
 
