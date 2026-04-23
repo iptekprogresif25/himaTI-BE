@@ -1,12 +1,44 @@
+import type { Context } from "hono"
 import * as AspirationModel from "../models/aspiration.model.js"
 import { uploadImage, deleteImage } from "../utils/image.js"
+import { createMeta, getQueryOptions } from "../utils/queryBuilder.js"
 
 
 // ✅ GET ALL
-export const getAspirations = async () => {
-  return await AspirationModel.findAll()
-}
+export const getAllWithQuery = async (c: Context) => {
 
+  // 🔥 semua diambil dari queryBuilder
+  const { page, limit, offset, search, sortBy, order } =
+    getQueryOptions(c, { defaultLimit: 6 })
+
+  // 🔒 whitelist sorting
+  const allowedSort = ['id', 'created_at', 'topic'] as const
+  const sortColumn = allowedSort.includes(sortBy as any)
+    ? sortBy
+    : 'created_at'
+
+  // 🔍 filter tambahan
+  const status = c.req.query('status') || undefined
+
+  const data = await AspirationModel.findAllWithQuery({
+    search,
+    status,
+    sortColumn,
+    order, // ✅ langsung dari queryBuilder
+    limit,
+    offset
+  })
+
+  const total = await AspirationModel.countAll({
+    search,
+    status
+  })
+
+  return {
+    data,
+    meta: createMeta(page, limit, total)
+  }
+}
 
 // ✅ GET BY ID
 export const getAspirationById = async (id: string) => {

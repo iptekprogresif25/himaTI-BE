@@ -4,9 +4,7 @@ import { swaggerUI } from "@hono/swagger-ui"
 // controllers
 import * as activityController from "../controllers/activity.controller.js"
 import * as authController from "../controllers/auth.controller.js"
-// controllers
 import * as productController from "../controllers/product.controller.js"
-// controllers
 import * as aspirationController from "../controllers/aspiration.controller.js"
 
 // validators
@@ -15,13 +13,13 @@ import {
   updateProductSchema,
   idSchema as productIdSchema
 } from "../validators/product.validator.js"
-// validators
+
 import {
   createActivitySchema,
   updateActivitySchema,
   idSchema
 } from "../validators/activity.validator.js"
-// validators
+
 import {
   createAspirationSchema,
   idSchema as aspirationIdSchema
@@ -29,350 +27,375 @@ import {
 
 const docApp = new OpenAPIHono()
 
-docApp.openAPIRegistry.registerComponent(
-  "securitySchemes",
-  "BearerAuth",
-  {
-    type: "http",
-    scheme: "bearer"
-  }
+// 🔐 Auth Scheme
+docApp.openAPIRegistry.registerComponent("securitySchemes", "BearerAuth", {
+  type: "http",
+  scheme: "bearer",
+  bearerFormat: "JWT"
+})
+
+// =====================
+// 🔧 GLOBAL SCHEMA
+// =====================
+
+const paginationQuerySchema = z.object({
+  page: z.string().optional(),
+  limit: z.string().optional(),
+  search: z.string().optional(),
+  sortBy: z.string().optional(),
+  order: z.enum(["asc", "desc"]).optional()
+})
+
+const metaSchema = z.object({
+  page: z.number(),
+  limit: z.number(),
+  total: z.number(),
+  totalPages: z.number()
+})
+
+const errorSchema = z.object({
+  message: z.string()
+})
+
+// =====================
+// 🔐 AUTH
+// =====================
+
+docApp.openapi(
+  createRoute({
+    method: "post",
+    path: "/api/auth/login",
+    tags: ["Auth"],
+    request: {
+      body: {
+        content: {
+          "application/json": {
+            schema: z.object({
+              email: z.string().email(),
+              password: z.string()
+            })
+          }
+        }
+      }
+    },
+    responses: {
+      200: { description: "Login success" },
+      401: { description: "Invalid credentials", content: { "application/json": { schema: errorSchema } } }
+    }
+  }),
+  authController.loginHandler
 )
 
-/**
- * =========================
- * 🔐 AUTH ROUTES
- * =========================
- */
+// =====================
+// 📦 ACTIVITY
+// =====================
 
-const loginRoute = createRoute({
-  method: "post",
-  path: "/api/auth/login",
-  tags: ["Auth"],
-  request: {
-    body: {
-      content: {
-        "application/json": {
-          schema: z.object({
-            email: z.string().email(),
-            password: z.string()
-          })
+docApp.openapi(
+  createRoute({
+    method: "get",
+    path: "/api/activity",
+    tags: ["Activity"],
+    request: { query: paginationQuerySchema },
+    responses: {
+      200: {
+        description: "Success",
+        content: {
+          "application/json": {
+            schema: z.object({
+              data: z.array(z.any()),
+              meta: metaSchema
+            })
+          }
+        }
+      },
+      500: { description: "Server Error", content: { "application/json": { schema: errorSchema } } }
+    }
+  }),
+  activityController.getAll as any
+)
+
+docApp.openapi(
+  createRoute({
+    method: "get",
+    path: "/api/activity/{id}",
+    tags: ["Activity"],
+    request: { params: idSchema },
+    responses: {
+      200: { description: "Found" },
+      404: { description: "Not found", content: { "application/json": { schema: errorSchema } } }
+    }
+  }),
+  activityController.getOne
+)
+
+docApp.openapi(
+  createRoute({
+    method: "post",
+    path: "/api/activity",
+    tags: ["Activity"],
+    security: [{ BearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          "multipart/form-data": { schema: createActivitySchema }
         }
       }
-    }
-  },
-  responses: {
-    200: {
-      description: "Login success"
     },
-    401: {
-      description: "Invalid credentials"
+    responses: {
+      201: { description: "Created" },
+      401: { description: "Unauthorized", content: { "application/json": { schema: errorSchema } } }
     }
-  }
-})
+  }),
+  activityController.create
+)
 
-docApp.openapi(loginRoute, authController.loginHandler)
-
-/**
- * =========================
- * 📦 ACTIVITY ROUTES
- * =========================
- */
-
-// GET ALL
-const getAllActivity = createRoute({
-  method: "get",
-  path: "/api/activity",
-  tags: ["Activity"],
-  responses: {
-    200: {
-      description: "Get all activities"
-    }
-  }
-})
-
-docApp.openapi(getAllActivity, activityController.getAll)
-
-
-// GET BY ID
-const getActivityById = createRoute({
-  method: "get",
-  path: "/api/activity/{id}",
-  tags: ["Activity"],
-  request: {
-    params: idSchema
-  },
-  responses: {
-    200: { description: "Activity found" },
-    404: { description: "Activity not found" }
-  }
-})
-
-docApp.openapi(getActivityById, activityController.getOne)
-
-
-// CREATE
-const createActivity = createRoute({
-  method: "post",
-  path: "/api/activity",
-  tags: ["Activity"],
-  security: [{ BearerAuth: [] }],
-  request: {
-    body: {
-      content: {
-        "multipart/form-data": {
-          schema: createActivitySchema
+docApp.openapi(
+  createRoute({
+    method: "patch",
+    path: "/api/activity/{id}",
+    tags: ["Activity"],
+    security: [{ BearerAuth: [] }],
+    request: {
+      params: idSchema,
+      body: {
+        content: {
+          "multipart/form-data": { schema: updateActivitySchema }
         }
       }
+    },
+    responses: {
+      200: { description: "Updated" },
+      404: { description: "Not found", content: { "application/json": { schema: errorSchema } } }
     }
-  },
-  responses: {
-    201: { description: "Activity created" },
-    401: { description: "Unauthorized" }
-  }
-})
+  }),
+  activityController.update
+)
 
-docApp.openapi(createActivity, activityController.create)
+docApp.openapi(
+  createRoute({
+    method: "delete",
+    path: "/api/activity/{id}",
+    tags: ["Activity"],
+    security: [{ BearerAuth: [] }],
+    request: { params: idSchema },
+    responses: {
+      200: { description: "Deleted" },
+      404: { description: "Not found", content: { "application/json": { schema: errorSchema } } }
+    }
+  }),
+  activityController.remove
+)
 
+// =====================
+// 📦 PRODUCT
+// =====================
 
-// UPDATE
-const updateActivity = createRoute({
-  method: "patch",
-  path: "/api/activity/{id}",
-  tags: ["Activity"],
-  security: [{ BearerAuth: [] }],
-  request: {
-    params: idSchema,
-    body: {
-      content: {
-        "multipart/form-data": {
-          schema: updateActivitySchema
+docApp.openapi(
+  createRoute({
+    method: "get",
+    path: "/api/product",
+    tags: ["Product"],
+    request: { query: paginationQuerySchema },
+    responses: {
+      200: {
+        description: "Success",
+        content: {
+          "application/json": {
+            schema: z.object({
+              data: z.array(z.any()),
+              meta: metaSchema
+            })
+          }
+        }
+      },
+      500: { description: "Server Error", content: { "application/json": { schema: errorSchema } } }
+    }
+  }),
+  productController.getAll as any
+)
+
+docApp.openapi(
+  createRoute({
+    method: "get",
+    path: "/api/product/{id}",
+    tags: ["Product"],
+    request: { params: productIdSchema },
+    responses: {
+      200: { description: "Found" },
+      404: { description: "Not found", content: { "application/json": { schema: errorSchema } } }
+    }
+  }),
+  productController.getOne
+)
+
+docApp.openapi(
+  createRoute({
+    method: "post",
+    path: "/api/product",
+    tags: ["Product"],
+    security: [{ BearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          "multipart/form-data": {
+            schema: createProductSchema.extend({
+              image: z.any()
+            })
+          }
         }
       }
+    },
+    responses: {
+      201: { description: "Created" },
+      401: { description: "Unauthorized", content: { "application/json": { schema: errorSchema } } }
     }
-  },
-  responses: {
-    200: { description: "Activity updated" },
-    404: { description: "Not found" }
-  }
-})
+  }),
+  productController.create
+)
 
-docApp.openapi(updateActivity, activityController.update)
-
-
-// DELETE
-const deleteActivity = createRoute({
-  method: "delete",
-  path: "/api/activity/{id}",
-  tags: ["Activity"],
-  security: [{ BearerAuth: [] }],
-  request: {
-    params: idSchema
-  },
-  responses: {
-    200: { description: "Deleted" },
-    404: { description: "Not found" }
-  }
-})
-
-docApp.openapi(deleteActivity, activityController.remove)
-
-const getAllProduct = createRoute({
-  method: "get",
-  path: "/api/product",
-  tags: ["Product"],
-  responses: {
-    200: {
-      description: "Get all products"
-    }
-  }
-})
-
-docApp.openapi(getAllProduct, productController.getAll)
-
-const getProductById = createRoute({
-  method: "get",
-  path: "/api/product/{id}",
-  tags: ["Product"],
-  request: {
-    params: productIdSchema
-  },
-  responses: {
-    200: { description: "Product found" },
-    404: { description: "Product not found" }
-  }
-})
-
-docApp.openapi(getProductById, productController.getOne)
-
-const createProduct = createRoute({
-  method: "post",
-  path: "/api/product",
-  tags: ["Product"],
-  security: [{ BearerAuth: [] }],
-  request: {
-    body: {
-      content: {
-        "multipart/form-data": {
-          schema: createProductSchema.extend({
-            image: z.any()
-          })
+docApp.openapi(
+  createRoute({
+    method: "patch",
+    path: "/api/product/{id}",
+    tags: ["Product"],
+    security: [{ BearerAuth: [] }],
+    request: {
+      params: productIdSchema,
+      body: {
+        content: {
+          "multipart/form-data": {
+            schema: updateProductSchema.extend({
+              image: z.any().optional()
+            })
+          }
         }
       }
+    },
+    responses: {
+      200: { description: "Updated" },
+      404: { description: "Not found", content: { "application/json": { schema: errorSchema } } }
     }
-  },
-  responses: {
-    201: { description: "Product created" },
-    401: { description: "Unauthorized" }
-  }
-})
+  }),
+  productController.update
+)
 
-docApp.openapi(createProduct, productController.create)
+docApp.openapi(
+  createRoute({
+    method: "delete",
+    path: "/api/product/{id}",
+    tags: ["Product"],
+    security: [{ BearerAuth: [] }],
+    request: { params: productIdSchema },
+    responses: {
+      200: { description: "Deleted" },
+      404: { description: "Not found", content: { "application/json": { schema: errorSchema } } }
+    }
+  }),
+  productController.remove
+)
 
-const updateProduct = createRoute({
-  method: "patch",
-  path: "/api/product/{id}",
-  tags: ["Product"],
-  security: [{ BearerAuth: [] }],
-  request: {
-    params: productIdSchema,
-    body: {
-      content: {
-        "multipart/form-data": {
-          schema: updateProductSchema.extend({
-            image: z.any().optional()
-          })
+// =====================
+// 📦 ASPIRATION
+// =====================
+
+docApp.openapi(
+  createRoute({
+    method: "get",
+    path: "/api/aspiration",
+    tags: ["Aspiration"],
+    request: {
+      query: paginationQuerySchema.extend({
+        status: z.string().optional()
+      })
+    },
+    responses: {
+      200: {
+        description: "Success",
+        content: {
+          "application/json": {
+            schema: z.object({
+              data: z.array(z.any()),
+              meta: metaSchema
+            })
+          }
+        }
+      },
+      500: { description: "Server Error", content: { "application/json": { schema: errorSchema } } }
+    }
+  }),
+  aspirationController.getAll as any
+)
+
+docApp.openapi(
+  createRoute({
+    method: "get",
+    path: "/api/aspiration/{id}",
+    tags: ["Aspiration"],
+    request: { params: aspirationIdSchema },
+    responses: {
+      200: { description: "Found" },
+      404: { description: "Not found", content: { "application/json": { schema: errorSchema } } }
+    }
+  }),
+  aspirationController.getOne
+)
+
+docApp.openapi(
+  createRoute({
+    method: "post",
+    path: "/api/aspiration",
+    tags: ["Aspiration"],
+    security: [{ BearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          "multipart/form-data": {
+            schema: createAspirationSchema.extend({
+              file: z.any().optional()
+            })
+          }
         }
       }
+    },
+    responses: {
+      201: { description: "Created" },
+      401: { description: "Unauthorized", content: { "application/json": { schema: errorSchema } } }
     }
-  },
-  responses: {
-    200: { description: "Product updated" },
-    404: { description: "Product not found" }
-  }
-})
+  }),
+  aspirationController.create
+)
 
-docApp.openapi(updateProduct, productController.update)
-
-const deleteProduct = createRoute({
-  method: "delete",
-  path: "/api/product/{id}",
-  tags: ["Product"],
-  security: [{ BearerAuth: [] }],
-  request: {
-    params: productIdSchema
-  },
-  responses: {
-    200: { description: "Product deleted" },
-    404: { description: "Product not found" }
-  }
-})
-
-docApp.openapi(deleteProduct, productController.remove)
-
-/**
- * =========================
- * 📦 ASPIRATION ROUTES
- * =========================
- */
-
-// GET ALL
-const getAllAspiration = createRoute({
-  method: "get",
-  path: "/api/aspiration",
-  tags: ["Aspiration"],
-  responses: {
-    200: {
-      description: "Get all aspirations"
+docApp.openapi(
+  createRoute({
+    method: "delete",
+    path: "/api/aspiration/{id}",
+    tags: ["Aspiration"],
+    security: [{ BearerAuth: [] }],
+    request: { params: aspirationIdSchema },
+    responses: {
+      200: { description: "Deleted" },
+      404: { description: "Not found", content: { "application/json": { schema: errorSchema } } }
     }
-  }
-})
+  }),
+  aspirationController.remove
+)
 
-docApp.openapi(getAllAspiration, aspirationController.getAll)
-
-
-// GET BY ID
-const getAspirationById = createRoute({
-  method: "get",
-  path: "/api/aspiration/{id}",
-  tags: ["Aspiration"],
-  request: {
-    params: aspirationIdSchema
-  },
-  responses: {
-    200: { description: "Aspiration found" },
-    404: { description: "Aspiration not found" }
-  }
-})
-
-docApp.openapi(getAspirationById, aspirationController.getOne)
-
-
-// CREATE
-const createAspiration = createRoute({
-  method: "post",
-  path: "/api/aspiration",
-  tags: ["Aspiration"],
-  security: [{ BearerAuth: [] }],
-  request: {
-    body: {
-      content: {
-        "multipart/form-data": {
-          schema: createAspirationSchema.extend({
-            file: z.any().optional()
-          })
-        }
-      }
-    }
-  },
-  responses: {
-    201: { description: "Aspiration created" },
-    401: { description: "Unauthorized" }
-  }
-})
-
-docApp.openapi(createAspiration, aspirationController.create)
-
-
-// DELETE
-const deleteAspiration = createRoute({
-  method: "delete",
-  path: "/api/aspiration/{id}",
-  tags: ["Aspiration"],
-  security: [{ BearerAuth: [] }],
-  request: {
-    params: aspirationIdSchema
-  },
-  responses: {
-    200: { description: "Aspiration deleted" },
-    404: { description: "Aspiration not found" }
-  }
-})
-
-docApp.openapi(deleteAspiration, aspirationController.remove)
-
-/**
- * =========================
- * 📘 OPENAPI CONFIG
- * =========================
- */
+// =====================
+// 📘 OPENAPI CONFIG
+// =====================
 
 docApp.doc("/openapi.json", {
   openapi: "3.0.0",
   info: {
     title: "HIMA TI API",
-    version: "1.0.0",
-    description: "Dokumentasi API HIMA TI Backend"
+    version: "1.0.0"
   }
 })
 
-/**
- * =========================
- * 🌐 SWAGGER UI
- * =========================
- */
+// =====================
+// 🌐 SWAGGER UI
+// =====================
 
-docApp.get("/swagger", swaggerUI({
-  url: "/openapi.json"
-}))
+docApp.get("/swagger", swaggerUI({ url: "/openapi.json" }))
 
 export default docApp

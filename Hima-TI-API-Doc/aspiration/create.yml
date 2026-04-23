@@ -11,8 +11,7 @@ http:
     data:
       - name: name
         type: text
-        value: kayu
-        disabled: true
+        value: cuex
       - name: category
         type: text
         value: dosem
@@ -32,7 +31,6 @@ http:
         type: file
         value:
           - /home/gagalmasukptn/Downloads/2abe91b7-c1c7-4e8e-b987-fd64bd13f859.jpg
-        disabled: true
   auth: inherit
 
 settings:

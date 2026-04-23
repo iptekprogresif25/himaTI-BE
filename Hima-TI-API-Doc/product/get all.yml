@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: http://localhost:3000/api/product
+  url: https://hima-ti-be.vercel.app/api/product
   auth: inherit
 
 settings:

@@ -3,21 +3,11 @@ import * as activityService from "../services/activity.service.js"
 
 export const getAll = async (c: Context) => {
   try {
-    const activities = await activityService.getActivities()
-
-    return c.json({
-      success: true,
-      message: "Success get activities",
-      data: activities
-    })
+    const result = await activityService.getAllActivities(c)
+    return c.json(result)
   } catch (err) {
     console.error(err)
-
-    return c.json({
-      success: false,
-      message: "Internal Server Error",
-      data: null
-    }, 500)
+    return c.json({ message: "Internal Server Error" }, 500)
   }
 }
 

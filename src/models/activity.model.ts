@@ -1,10 +1,46 @@
 import { sql } from "../config/db.js"
 
-export const findAll = async () => {
-  return await sql`
+export const findAllWithQuery = async ({
+  search,
+  sortColumn,
+  order,
+  limit,
+  offset
+}: {
+  search: string
+  sortColumn: string
+  order: "ASC" | "DESC"
+  limit: number
+  offset: number
+}) => {
+
+  // base query
+  let query = sql`
     SELECT * FROM activities
-    ORDER BY created_at DESC
+    WHERE name ILIKE ${'%' + search + '%'}
   `
+
+  const data = await sql`
+    ${query}
+    ORDER BY ${sql.unsafe(`${sortColumn} ${order}`)}
+    LIMIT ${limit} OFFSET ${offset}
+  `
+
+  return data
+}
+
+export const countAll = async ({
+  search
+}: {
+  search: string
+}) => {
+
+  const result = await sql`
+    SELECT COUNT(*) FROM activities
+    WHERE name ILIKE ${'%' + search + '%'}
+  `
+
+  return Number(result[0].count)
 }
 
 export const findById = async (id: string) => {

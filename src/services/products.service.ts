@@ -1,8 +1,36 @@
 import * as ProductModel from "../models/product.model.js"
 import { uploadImage, deleteImage } from "../utils/image.js"
+import type { Context } from "hono"
+import { getQueryOptions, createMeta } from "../utils/queryBuilder.js"
 
-export const getProducts = async () => {
-  return await ProductModel.findAll()
+export const getAllProducts = async (c: Context) => {
+
+  // 🔥 default product misalnya 8
+  const { page, limit, offset, search, sortBy, order } =
+    getQueryOptions(c, { defaultLimit: 8 })
+
+  // 🔒 whitelist sorting
+  const allowedSort = ['id', 'created_at', 'name', 'price'] as const
+  const sortColumn = allowedSort.includes(sortBy as any)
+    ? sortBy
+    : 'created_at'
+
+  const data = await ProductModel.findAllWithQuery({
+    search,
+    sortColumn,
+    order,
+    limit,
+    offset
+  })
+
+  const total = await ProductModel.countAll({
+    search
+  })
+
+  return {
+    data,
+    meta: createMeta(page, limit, total)
+  }
 }
 
 export const getProductById = async (id: string) => {

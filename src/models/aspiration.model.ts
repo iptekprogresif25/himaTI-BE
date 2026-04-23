@@ -1,11 +1,75 @@
 import { sql } from "../config/db.js"
 
-// ✅ GET ALL
-export const findAll = async () => {
-  return await sql`
+// 🔥 GET ALL + pagination + filter + sorting
+export const findAllWithQuery = async ({
+  search,
+  status,
+  sortColumn,
+  order,
+  limit,
+  offset
+}: {
+  search: string
+  status?: string
+  sortColumn: string
+  order: 'ASC' | 'DESC'
+  limit: number
+  offset: number
+}) => {
+
+  // base query
+  let query = sql`
     SELECT * FROM aspirations
-    ORDER BY created_at DESC
+    WHERE topic ILIKE ${'%' + search + '%'}
   `
+
+  // optional filter
+  if (status) {
+    query = sql`
+      ${query} AND status = ${status}
+    `
+  }
+
+  const allowedSort = ['id', 'created_at', 'topic']
+  const safeSort = allowedSort.includes(sortColumn) ? sortColumn : 'created_at'
+
+  const safeOrder = order === 'ASC' ? 'ASC' : 'DESC'
+
+  // 🔥 inject manual (AMAN karena sudah whitelist)
+  const data = await sql`
+    SELECT * FROM aspirations
+    WHERE topic ILIKE ${'%' + search + '%'}
+    ${status ? sql`AND status = ${status}` : sql``}
+    ORDER BY ${sql.unsafe(`${safeSort} ${safeOrder}`)}
+    LIMIT ${limit} OFFSET ${offset}
+  `
+
+  return data
+}
+
+// 🔥 COUNT
+export const countAll = async ({
+  search,
+  status
+}: {
+  search: string
+  status?: string
+}) => {
+
+  let query = sql`
+    SELECT COUNT(*) FROM aspirations
+    WHERE topic ILIKE ${'%' + search + '%'}
+  `
+
+  if (status) {
+    query = sql`
+      ${query} AND status = ${status}
+    `
+  }
+
+  const result = await query
+
+  return Number(result[0].count)
 }
 
 // ✅ GET BY ID

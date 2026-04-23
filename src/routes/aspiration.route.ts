@@ -10,11 +10,10 @@ import {
 
 const aspirationRoute = new Hono()
 
-aspirationRoute.get("/", authMiddleware, controller.getAll)
+aspirationRoute.get("/", controller.getAll)
 
 aspirationRoute.get(
   "/:id",
-  authMiddleware,
   zValidator("param", idSchema),
   controller.getOne
 )

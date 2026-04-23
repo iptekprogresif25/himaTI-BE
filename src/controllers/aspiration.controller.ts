@@ -3,19 +3,11 @@ import * as aspirationService from "../services/aspiration.service.js"
 
 export const getAll = async (c: Context) => {
   try {
-
-    const aspirations = await aspirationService.getAspirations()
-
-    return c.json(aspirations)
-
+    const result = await aspirationService.getAllWithQuery(c)
+    return c.json(result)
   } catch (err) {
-
     console.error(err)
-
-    return c.json({
-      message: "Internal Server Error"
-    }, 500)
-
+    return c.json({ message: "Internal Server Error" }, 500)
   }
 }
 

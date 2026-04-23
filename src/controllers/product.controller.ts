@@ -4,9 +4,9 @@ import * as productService from "../services/products.service.js"
 export const getAll = async (c: Context) => {
   try {
 
-    const products = await productService.getProducts()
+    const result = await productService.getAllProducts(c)
 
-    return c.json(products)
+    return c.json(result)
 
   } catch (err) {
 

@@ -1,8 +1,36 @@
+import type { Context } from "hono"
 import * as activityModel from "../models/activity.model.js"
 import { uploadImage, deleteImage } from "../utils/image.js"
+import { createMeta, getQueryOptions } from "../utils/queryBuilder.js"
 
-export const getActivities = async () => {
-  return await activityModel.findAll()
+export const getAllActivities = async (c: Context) => {
+
+  // 🔥 activity default 4 data
+  const { page, limit, offset, search, sortBy, order } =
+    getQueryOptions(c, { defaultLimit: 4 })
+
+  // 🔒 whitelist sorting
+  const allowedSort = ['id', 'created_at', 'title'] as const
+  const sortColumn = allowedSort.includes(sortBy as any)
+    ? sortBy
+    : 'created_at'
+
+  const data = await activityModel.findAllWithQuery({
+    search,
+    sortColumn,
+    order,
+    limit,
+    offset
+  })
+
+  const total = await activityModel.countAll({
+    search
+  })
+
+  return {
+    data,
+    meta: createMeta(page, limit, total)
+  }
 }
 
 export const getActivityById = async (id: string) => {
