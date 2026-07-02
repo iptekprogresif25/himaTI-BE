@@ -1,0 +1,33 @@
+info:
+  name: create-activity
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: http://localhost:3000/api/activity
+  body:
+    type: multipart-form
+    data:
+      - name: name
+        type: text
+        value: pengabdian
+      - name: description
+        type: text
+        value: pengabdian di ekraf
+      - name: url
+        type: text
+        value: https://example.com/pameran
+      - name: image
+        type: file
+        value:
+          - /home/gagalmasukptn/Downloads/f69c5f20-ac5f-43c2-988a-9d42a45c20bd.jpg
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImYwMTVkZWYzLTc2Y2EtNDEyMS05YTM5LTRjMWNiNzI2OGM3MSIsImVtYWlsIjoiYXRtaW5AZXhhbXBsZS5jb20iLCJpYXQiOjE3NzYyNTIyOTgsImV4cCI6MTc3NjI1NTg5OH0.UJZK5CP3oBILDzqlNoRrh18N_blLyZ0KxRfIegv_1gQ
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

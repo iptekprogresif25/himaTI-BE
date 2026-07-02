@@ -1,0 +1,40 @@
+info:
+  name: create
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:3000/api/aspiration
+  body:
+    type: multipart-form
+    data:
+      - name: name
+        type: text
+        value: cuex
+      - name: category
+        type: text
+        value: dosem
+      - name: topic
+        type: text
+        value: dosen pemelas
+      - name: description
+        type: text
+        value: biaslaah diamah
+      - name: urgency
+        type: text
+        value: "5"
+      - name: contact_person
+        type: text
+        value: w@f.com
+      - name: file
+        type: file
+        value:
+          - /home/gagalmasukptn/Downloads/IMG_6420.HEIC
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

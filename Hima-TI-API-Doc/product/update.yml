@@ -1,0 +1,43 @@
+info:
+  name: update
+  type: http
+  seq: 4
+
+http:
+  method: PATCH
+  url: http://localhost:3000/api/product/0879bd5a-2ede-4dad-a734-4f3120482a9c
+  body:
+    type: multipart-form
+    data:
+      - name: name
+        type: text
+        value: kerul tengsi
+        disabled: true
+      - name: description
+        type: text
+        value: moal bal  hshshshs eg
+        disabled: true
+      - name: category
+        type: text
+        value: minum makan
+      - name: url
+        type: text
+        value: http://ocalhost:3000/api/product
+        disabled: true
+      - name: price
+        type: text
+        value: "13000"
+        disabled: true
+      - name: image
+        type: file
+        value:
+          - /home/gagalmasukptn/Downloads/Nasabah.png
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImYwMTVkZWYzLTc2Y2EtNDEyMS05YTM5LTRjMWNiNzI2OGM3MSIsImVtYWlsIjoiaGltYVRJQHVuaWt1LmFjLmlkIiwiaWF0IjoxNzc2NDg4ODc3LCJleHAiOjE3NzY0OTI0Nzd9.oFM3PhSKKAn_ZPEucljAldMWtMiOHFlJJKwNABQpf2Q
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

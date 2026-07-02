@@ -1,0 +1,17 @@
+info:
+  name: delete
+  type: http
+  seq: 7
+
+http:
+  method: DELETE
+  url: http://localhost:3000/activity/9ff57626-bc59-44df-82d9-3a5fde879869
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExY2FiMWU5LWVmYTctNDc2ZC05M2M3LWZhNTE5YjQxYjllZCIsImVtYWlsIjoiYXRtaW5AZXhhbXBsZS5jb20iLCJpYXQiOjE3NzM1MTExMjUsImV4cCI6MTc3MzUxNDcyNX0.BlG8CJj_TuWziZdWv4rgBTnpBbgDdYJvDpo6uhL0JV0
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

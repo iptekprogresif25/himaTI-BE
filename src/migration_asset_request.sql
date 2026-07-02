@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS asset_requests (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  asset_id UUID REFERENCES digital_assets(id) ON DELETE CASCADE,
+  name VARCHAR(100) NOT NULL,
+  whatsapp VARCHAR(20) NOT NULL,
+  organization VARCHAR(150),
+  reason TEXT NOT NULL,
+  status VARCHAR(20) DEFAULT 'pending',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);

@@ -1,0 +1,1 @@
+ALTER TABLE asset_requests ADD COLUMN IF NOT EXISTS email VARCHAR(150);
