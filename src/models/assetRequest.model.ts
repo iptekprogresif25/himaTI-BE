@@ -8,16 +8,18 @@ export interface AssetRequest {
   organization?: string;
   reason: string;
   email?: string;
+  borrow_start_date?: string;
+  borrow_end_date?: string;
   status?: 'pending' | 'approved' | 'rejected';
   created_at?: string;
   updated_at?: string;
 }
 
 export const create = async (requestData: AssetRequest) => {
-  const { asset_id, name, whatsapp, organization, reason, email } = requestData;
+  const { asset_id, name, whatsapp, organization, reason, email, borrow_start_date, borrow_end_date } = requestData;
   const result = await sql`
-    INSERT INTO asset_requests (asset_id, name, whatsapp, organization, reason, email)
-    VALUES (${asset_id}, ${name}, ${whatsapp}, ${organization || null}, ${reason}, ${email || null})
+    INSERT INTO asset_requests (asset_id, name, whatsapp, organization, reason, email, borrow_start_date, borrow_end_date)
+    VALUES (${asset_id}, ${name}, ${whatsapp}, ${organization || null}, ${reason}, ${email || null}, ${borrow_start_date || null}, ${borrow_end_date || null})
     RETURNING *
   `;
   return result[0];
@@ -29,6 +31,18 @@ export const findAll = async () => {
     FROM asset_requests ar
     LEFT JOIN digital_assets da ON ar.asset_id = da.id
     ORDER BY ar.created_at DESC
+  `;
+  return result;
+};
+
+export const findBookedDatesByAssetId = async (assetId: string) => {
+  const result = await sql`
+    SELECT borrow_start_date, borrow_end_date
+    FROM asset_requests
+    WHERE asset_id = ${assetId}
+      AND status = 'approved'
+      AND borrow_start_date IS NOT NULL
+      AND borrow_end_date IS NOT NULL
   `;
   return result;
 };

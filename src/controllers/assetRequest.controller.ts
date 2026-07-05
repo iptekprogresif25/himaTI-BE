@@ -28,6 +28,19 @@ export const getAssetRequests = async (c: Context) => {
   }
 };
 
+export const getAssetBookedDates = async (c: Context) => {
+  try {
+    const assetId = c.req.param("assetId");
+    if (!assetId) return c.json({ success: false, message: "Asset ID is required" }, 400);
+
+    const bookedDates = await AssetRequestModel.findBookedDatesByAssetId(assetId);
+    return c.json({ success: true, data: bookedDates }, 200);
+  } catch (error: any) {
+    console.error('Error fetching booked dates:', error);
+    return c.json({ success: false, message: 'Gagal mengambil data tanggal peminjaman', error: error.message }, 500);
+  }
+};
+
 import { sendApprovalEmail } from '../utils/mailer.js';
 import * as DigitalAssetModel from '../models/digitalAsset.model.js';
 
@@ -49,7 +62,12 @@ export const updateAssetRequestStatus = async (c: Context) => {
       try {
         const asset = await DigitalAssetModel.findById(updatedRequest.asset_id);
         if (asset) {
-          const emailResult = await sendApprovalEmail(updatedRequest.email, asset.title, updatedRequest.name);
+          const links = {
+            demo_url: asset.demo_url,
+            repo_url: asset.repo_url,
+            guide_url: asset.guide_url
+          };
+          const emailResult = await sendApprovalEmail(updatedRequest.email, asset.title, updatedRequest.name, links);
           if (emailResult && !emailResult.success) {
              emailWarning = `Peringatan: Gagal mengirim email ke ${updatedRequest.email}. Alasan: ${emailResult.error}`;
           }
