@@ -37,7 +37,7 @@ export const findAll = async () => {
 
 export const findBookedDatesByAssetId = async (assetId: string) => {
   const result = await sql`
-    SELECT borrow_start_date, borrow_end_date
+    SELECT name, organization, borrow_start_date, borrow_end_date
     FROM asset_requests
     WHERE asset_id = ${assetId}
       AND status = 'approved'
