@@ -73,7 +73,8 @@ export const create = async (data: any) => {
       testimonial,
       changelog,
       faqs,
-      is_limited
+      is_limited,
+      max_borrowers
     )
     VALUES (
       ${data.title},
@@ -98,7 +99,8 @@ export const create = async (data: any) => {
       ${data.testimonial},
       ${data.changelog},
       ${data.faqs},
-      COALESCE(${data.is_limited}, false)
+      COALESCE(${data.is_limited}, false),
+      COALESCE(${data.max_borrowers}, 2)
     )
     RETURNING *
   `
@@ -132,6 +134,7 @@ export const update = async (id: string, data: any) => {
       changelog = COALESCE(${data.changelog}, changelog),
       faqs = COALESCE(${data.faqs}, faqs),
       is_limited = COALESCE(${data.is_limited}, is_limited),
+      max_borrowers = COALESCE(${data.max_borrowers}, max_borrowers),
       updated_at = NOW()
     WHERE id = ${id}
     RETURNING *

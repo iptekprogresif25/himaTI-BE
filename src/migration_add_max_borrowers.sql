@@ -1,0 +1,1 @@
+ALTER TABLE digital_assets ADD COLUMN IF NOT EXISTS max_borrowers INTEGER DEFAULT 2;
